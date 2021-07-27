@@ -81,26 +81,45 @@ ax.legend()
 fig.savefig("temp.png")
 
 ## Calculate difference between high and low kestrels
-differenceDTList = list()
-differenceTList = list()
+kestrelDifferenceDTList = list()
+kestrelDifferenceTList = list()
 for targetDate in drop1dtList:
     if targetDate in drop2dtList:
         drop1TargetTemp = drop1TList[drop1dtList.index(targetDate)]
         drop2TargetTemp = drop2TList[drop2dtList.index(targetDate)]
-        diff = drop1TargetTemp - drop2TargetTemp
-        differenceDTList.append(targetDate)
-        differenceTList.append(diff)
+        kestrelDiff = drop1TargetTemp - drop2TargetTemp
+        kestrelDifferenceDTList.append(targetDate)
+        kestrelDifferenceTList.append(kestrelDiff)
 
 ## Plot differences
-diffFig = plt.figure()
-diffFig.set_size_inches(1920*px, 1080*px)
-diffAx = plt.axes()
-diffAx.plot(differenceDTList, differenceTList, label="Difference")
-diffAx.set_xlabel("Date")
-diffAx.set_ylabel("Difference in T, positive = inverstion")
-diffFig.savefig("difference.png")
+kestrelDiffFig = plt.figure()
+kestrelDiffFig.set_size_inches(1920*px, 1080*px)
+kestrelDiffAx = plt.axes()
+kestrelDiffAx.plot(kestrelDifferenceDTList, kestrelDifferenceTList, label="Difference")
+kestrelDiffAx.set_xlabel("Date")
+kestrelDiffAx.set_ylabel("Difference in T, positive = inverstion")
+kestrelDiffFig.savefig("kestreldiff.png")
+## Print a table of that
+kestrelDiffTable = pd.DataFrame(data={"Date" : kestrelDifferenceDTList, "Difference" : kestrelDifferenceTList})
+print(kestrelDiffTable)
 
-## Print a table
-diffTable = pd.DataFrame(data={"Date" : differenceDTList, "Difference" : differenceTList})
-print(diffTable)
+## Plot differences in low PRT and low kestrel (calibration)
+lowLowDiffDTList = list()
+lowLowDiffTList = list()
+for targetDate in drop1dtList:
+    if targetDate in prtdtList:
+        drop1TargetTemp = drop1TList[drop1dtList.index(targetDate)]
+        prtTargetTemp = prtTList[prtdtList.index(targetDate)]
+        lowLowDiff = drop1TargetTemp - prtTargetTemp
+        lowLowDiffDTList.append(targetDate)
+        lowLowDiffTList.append(lowLowDiff)
+lowlowDiffFig = plt.figure()
+lowlowDiffFig.set_size_inches(1920*px, 1080*px)
+lowlowDiffAx = plt.axes()
+lowlowDiffAx.plot(lowLowDiffDTList, lowLowDiffTList, label="Difference")
+lowlowDiffAx.set_xlabel("Date")
+lowlowDiffAx.set_ylabel("Difference in T, positive = kestrel warmer")
+lowlowDiffFig.savefig("lowlowdiff.png")
+
+
 ## Thanks, and gig'em!
