@@ -80,4 +80,27 @@ ax.legend()
 ## Save fig as "test.png" in current directory
 fig.savefig("temp.png")
 
+## Calculate difference between high and low kestrels
+differenceDTList = list()
+differenceTList = list()
+for targetDate in drop1dtList:
+    if targetDate in drop2dtList:
+        drop1TargetTemp = drop1TList[drop1dtList.index(targetDate)]
+        drop2TargetTemp = drop2TList[drop2dtList.index(targetDate)]
+        diff = drop1TargetTemp - drop2TargetTemp
+        differenceDTList.append(targetDate)
+        differenceTList.append(diff)
+
+## Plot differences
+diffFig = plt.figure()
+diffFig.set_size_inches(1920*px, 1080*px)
+diffAx = plt.axes()
+diffAx.plot(differenceDTList, differenceTList, label="Difference")
+diffAx.set_xlabel("Date")
+diffAx.set_ylabel("Difference in T, positive = inverstion")
+diffFig.savefig("difference.png")
+
+## Print a table
+diffTable = pd.DataFrame(data={"Date" : differenceDTList, "Difference" : differenceTList})
+print(diffTable)
 ## Thanks, and gig'em!
