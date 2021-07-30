@@ -4,6 +4,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 from datetime import datetime as dt
+from datetime import timedelta
 
 rowstodrop1 = 6 #configure this as needed (rows including units of unusable data)
 rowstodrop2 = 8 #configure this as needed (rows including units of unusable data)
@@ -101,7 +102,26 @@ kestrelDiffAx.set_ylabel("Difference in T, positive = inverstion")
 kestrelDiffFig.savefig("kestreldiff.png")
 ## Print a table of that
 kestrelDiffTable = pd.DataFrame(data={"Date" : kestrelDifferenceDTList, "Difference" : kestrelDifferenceTList})
-print(kestrelDiffTable)
+## Generate list of inversion date ranges
+inversionDiffTable = kestrelDiffTable[kestrelDiffTable["Difference"] >= 0].reset_index(drop=True)
+inversionRanges = list()
+workingInversionRange = list()
+## Always add the first object
+workingInversionRange.append(kestrelDifferenceDTList[0])
+for x in range(1, len(inversionDiffTable["Date"])):
+    ## Check to see if nth datetime object is one minute after the (n-1)th date object. If it is, then we have a successive minute and we can move on
+    if inversionDiffTable["Date"][x] - timedelta(minutes=1) != inversionDiffTable["Date"][x - 1]:
+        ## If the nth time is \not\ one minute after the (n-1)th, then we know that particular micro-inversion ended and a new one has begun, so we add the last minute of the last inversion to the workingInversionRange.
+        ## workingInversionRange now contains the first and last minute that a particular inversion occurred
+        workingInversionRange.append(inversionDiffTable["Date"][x - 1])
+        ## add the list containing the first and last minute to the list of ALL first and last minutes
+        inversionRanges.append(workingInversionRange)
+        ## create a new workingInversionRange for the new inversion
+        workingInversionRange = [inversionDiffTable["Date"][x]]
+## Print the start and end time of every micro-inversion
+for invEventNum in range(len(inversionRanges)):
+    print("Micro-inversion "+str(invEventNum + 1)+" of "+str(len(inversionRanges) + 1)+" began at "+str(inversionRanges[invEventNum][0])+"\nEnded at: "+str(inversionRanges[invEventNum][1])+"\n")
+
 
 ## Plot differences in low PRT and low kestrel (calibration)
 lowLowDiffDTList = list()
